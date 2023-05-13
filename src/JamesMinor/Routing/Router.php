@@ -35,7 +35,7 @@ class Router
 	 * @var callable The callback function that gets called when the Router cannot find a
 	 * route matching the request URI.
 	 */
-	private $notFoundCallback;
+	private $http404Callback;
 
 	/**
 	 * Default constructor for the Router class.
@@ -44,7 +44,7 @@ class Router
 	{
 		$this->routes = array();
 
-		$this->notFoundCallback = function()
+		$this->http404Callback = function()
 		{
 			echo '<h1>404</h1>';
 			echo '<span>Page not found.</span>';
@@ -178,10 +178,10 @@ class Router
 		}
 
 		// Calling the 404 callback if the requested route does not exist.
-		if(is_callable($this->notFoundCallback))
+		if(is_callable($this->http404Callback))
 		{
 			http_response_code(404);
-			call_user_func($this->notFoundCallback);
+			call_user_func($this->http404Callback);
 		}
 	}
 
@@ -191,9 +191,9 @@ class Router
 	 * @param callable $callback The 404 callback function.
 	 * @return void
 	 */
-	public function setNotFoundCallback(callable $callback): void
+	public function setHttp404Callback(callable $callback): void
 	{
-		$this->notFoundCallback = $callback;
+		$this->http404Callback = $callback;
 	}
 
 	/**
