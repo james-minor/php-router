@@ -8,6 +8,16 @@ use Stringable;
 class Router
 {
 	/**
+	 * String array of supported HTTP request methods.
+	 */
+	public const SUPPORTED_HTTP_METHODS = array(
+		'GET',
+		'POST',
+		'PUT',
+		'DELETE'
+	);
+
+	/**
 	 * @var array Array of callbacks that will be called before a route is searched for.
 	 */
 	private array $beforeRouterMiddleware;
@@ -16,6 +26,20 @@ class Router
 	 * @var array Array of callbacks that will be called after a route is searched for.
 	 */
 	private array $afterRouterMiddleware;
+
+	/**
+	 * @var array Multidimensional array of URI routes, see <b>$routes</b> documentation for
+	 * more information on array schema. Will call each middleware callback <b>before</b> the corresponding route(s)
+	 * callback(s).
+	 */
+	private array $beforeMiddleware;
+
+	/**
+	 * @var array Multidimensional array of URI routes, see <b>$routes</b> documentation for
+	 * more information on array schema. Will call each middleware callback <b>after</b> the corresponding route(s)
+	 * callback(s).
+	 */
+	private array $afterMiddleware;
 
 	/**
 	 * @var array Multidimensional array of URI routes, each entry is an array with the following keys:
@@ -55,6 +79,9 @@ class Router
 		$this->beforeRouterMiddleware = array();
 		$this->afterRouterMiddleware = array();
 
+		$this->beforeMiddleware = array();
+		$this->afterMiddleware = array();
+
 		$this->routes = array();
 
 		$this->http404Callback = function()
@@ -75,7 +102,7 @@ class Router
 	 */
 	public function get(Stringable|string $pattern, callable $callback): void
 	{
-		$this->addRoute(['GET'], $pattern, $callback);
+		$this->addRoute($this->routes, ['GET'], $pattern, $callback);
 	}
 
 	/**
@@ -89,7 +116,7 @@ class Router
 	 */
 	public function post(Stringable|string $pattern, callable $callback): void
 	{
-		$this->addRoute(['POST'], $pattern, $callback);
+		$this->addRoute($this->routes, ['POST'], $pattern, $callback);
 	}
 
 	/**
@@ -103,7 +130,7 @@ class Router
 	 */
 	public function put(Stringable|string $pattern, callable $callback): void
 	{
-		$this->addRoute(['PUT'], $pattern, $callback);
+		$this->addRoute($this->routes, ['PUT'], $pattern, $callback);
 	}
 
 	/**
@@ -117,7 +144,7 @@ class Router
 	 */
 	public function delete(Stringable|string $pattern, callable $callback): void
 	{
-		$this->addRoute(['DELETE'], $pattern, $callback);
+		$this->addRoute($this->routes, ['DELETE'], $pattern, $callback);
 	}
 
 	/**
@@ -130,7 +157,7 @@ class Router
 	 */
 	public function map(array $methods, Stringable|string $pattern, callable $callback): void
 	{
-		$this->addRoute($methods, $pattern, $callback);
+		$this->addRoute($this->routes, $methods, $pattern, $callback);
 	}
 
 	/**
@@ -157,11 +184,44 @@ class Router
 			$requestURI = $_SERVER['REQUEST_URI'];
 		}
 
+		// Iterating over each route before middleware.
+		$this->iterateOverRouteArray($this->beforeMiddleware, $requestURI);
+
+		// Iterating over each route.
+		$foundMatchingRoute = $this->iterateOverRouteArray($this->routes, $requestURI);
+
+		// Iterating over each route after middleware.
+		$this->iterateOverRouteArray($this->afterMiddleware, $requestURI);
+
+		// Calling the 404 callback if the requested route does not exist.
+		if(!$foundMatchingRoute && is_callable($this->http404Callback))
+		{
+			http_response_code(404);
+			call_user_func($this->http404Callback);
+		}
+
+		// Calling after router middleware.
+		foreach($this->afterRouterMiddleware as $middleware)
+		{
+			$middleware();
+		}
+	}
+
+	/**
+	 * Iterates over an array following the routes array schema, and if any matches are found
+	 * calls that routes corresponding callback.
+	 *
+	 * @param array $routes The array of URI routes.
+	 * @param string $requestURI The requested URI from the end-user.
+	 * @return bool True if any routes were found, otherwise returns false.
+	 */
+	private function iterateOverRouteArray(array $routes, string $requestURI): bool
+	{
 		// Iterating over each route, checking for matches.
 		$foundMatchingRoute = false;
-		foreach($this->routes as $route)
+		foreach($routes as $route)
 		{
-			// Checking if the route method matches the server request method.
+			// Checking if the route request method matches the server request method.
 			if($route['method'] !== $_SERVER['REQUEST_METHOD'])
 			{
 				continue;
@@ -190,18 +250,7 @@ class Router
 			}
 		}
 
-		// Calling the 404 callback if the requested route does not exist.
-		if(!$foundMatchingRoute && is_callable($this->http404Callback))
-		{
-			http_response_code(404);
-			call_user_func($this->http404Callback);
-		}
-
-		// Calling after router middleware.
-		foreach($this->afterRouterMiddleware as $middleware)
-		{
-			$middleware();
-		}
+		return $foundMatchingRoute;
 	}
 
 	/**
@@ -216,34 +265,27 @@ class Router
 	}
 
 	/**
-	 * Adds a route to the routes array.
+	 * Adds a route to an array matching the routes array schema.
 	 *
+	 * @param array $target The target array to append to.
 	 * @param array $methods Array of HTTP methods that the route will respond to.
 	 * @param Stringable|string $pattern The pattern corresponding to the route, e.g. <b>/articles/{slug}</b>.
 	 * @param callable $callback The route callback function.
 	 * @return void
 	 */
-	private function addRoute(array $methods, Stringable|string $pattern, callable $callback): void
+	private function addRoute(array &$target, array $methods, Stringable|string $pattern, callable $callback): void
 	{
-		// Array of supported HTTP methods.
-		$supportedMethods = array(
-			'GET',
-			'POST',
-			'PUT',
-			'DELETE'
-		);
-
 		// Iterating over each passed method.
 		foreach($methods as $method)
 		{
 			// Checking if the passed method is supported.
-			if(!in_array(strtoupper($method), $supportedMethods))
+			if(!in_array(strtoupper($method), self::SUPPORTED_HTTP_METHODS))
 			{
 				throw new DomainException('Method "' . $method . '" is not a supported HTTP method type.');
 			}
 
 			// Adding the route to the routes array.
-			$this->routes[] = array(
+			$target[] = array(
 				'method' => $method,
 				'pattern' => $pattern,
 				'callback' => $callback
@@ -271,6 +313,30 @@ class Router
 	public function addAfterRouterMiddleware(callable $callback): void
 	{
 		$this->afterRouterMiddleware[] = $callback;
+	}
+
+	/**
+	 * Adds middleware to be called before the corresponding route callback(s).
+	 *
+	 * @param array $methods Array of HTTP methods to respond to, e.g. ['GET', 'POST'].
+	 * @param Stringable|string $pattern The pattern corresponding to the middleware, e.g. <b>/articles/{slug}</b>.
+	 * @param callable $callback The middleware callback function.
+	 */
+	public function addBeforeMiddleware(array $methods, Stringable|string $pattern, callable $callback): void
+	{
+		$this->addRoute($this->beforeMiddleware, $methods, $pattern, $callback);
+	}
+
+	/**
+	 * Adds middleware to be called after the corresponding route callback(s).
+	 *
+	 * @param array $methods Array of HTTP methods to respond to, e.g. ['GET', 'POST'].
+	 * @param Stringable|string $pattern The pattern corresponding to the middleware, e.g. <b>/articles/{slug}</b>.
+	 * @param callable $callback The middleware callback function.
+	 */
+	public function addAfterMiddleware(array $methods, Stringable|string $pattern, callable $callback): void
+	{
+		$this->addRoute($this->afterMiddleware, $methods, $pattern, $callback);
 	}
 
 	/**
