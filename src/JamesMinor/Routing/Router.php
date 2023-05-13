@@ -8,6 +8,16 @@ use Stringable;
 class Router
 {
 	/**
+	 * @var array Array of callbacks that will be called before a route is searched for.
+	 */
+	private array $beforeRouterMiddleware;
+
+	/**
+	 * @var array Array of callbacks that will be called after a route is searched for.
+	 */
+	private array $afterRouterMiddleware;
+
+	/**
 	 * @var array Multidimensional array of URI routes, each entry is an array with the following keys:
 	 *
 	 * <table>
@@ -42,6 +52,9 @@ class Router
 	 */
 	public function __construct()
 	{
+		$this->beforeRouterMiddleware = array();
+		$this->afterRouterMiddleware = array();
+
 		$this->routes = array();
 
 		$this->http404Callback = function()
@@ -128,6 +141,12 @@ class Router
 	 */
 	public function run(): void
 	{
+		// Calling before router middleware.
+		foreach($this->beforeRouterMiddleware as $middleware)
+		{
+			$middleware();
+		}
+
 		// Getting the request URI, minus any URL parameters.
 		if(str_contains($_SERVER['REQUEST_URI'], '?'))
 		{
@@ -171,17 +190,17 @@ class Router
 			}
 		}
 
-		// Exiting the function if a route for the requested URI exists.
-		if($foundMatchingRoute)
-		{
-			return;
-		}
-
 		// Calling the 404 callback if the requested route does not exist.
-		if(is_callable($this->http404Callback))
+		if(!$foundMatchingRoute && is_callable($this->http404Callback))
 		{
 			http_response_code(404);
 			call_user_func($this->http404Callback);
+		}
+
+		// Calling after router middleware.
+		foreach($this->afterRouterMiddleware as $middleware)
+		{
+			$middleware();
 		}
 	}
 
@@ -230,6 +249,28 @@ class Router
 				'callback' => $callback
 			);
 		}
+	}
+
+	/**
+	 * Adds middleware that will be called before the router searches for a route.
+	 *
+	 * @param callable $callback The middleware callback.
+	 * @return void
+	 */
+	public function addBeforeRouterMiddleware(callable $callback): void
+	{
+		$this->beforeRouterMiddleware[] = $callback;
+	}
+
+	/**
+	 * Adds middleware that will be called after the router searches for a route.
+	 *
+	 * @param callable $callback The middleware callback.
+	 * @return void
+	 */
+	public function addAfterRouterMiddleware(callable $callback): void
+	{
+		$this->afterRouterMiddleware[] = $callback;
 	}
 
 	/**
