@@ -1,0 +1,27 @@
+{
+    "name": "james-minor/php-router",
+    "description": "A modern routing library for modern PHP: single-file, modern, and object-oriented.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["routing", "router"],
+    "authors": [
+        {
+            "name": "James Minor",
+            "email": "contact@james-minor.com",
+            "homepage": "https://www.james-minor.com",
+            "role": "developer"
+        }
+    ],
+    "funding": [
+        {
+            "type": "BuyMeACoffee",
+            "url": "https://www.buymeacoffee.com/jamesminor"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.1"
+    }
+}
