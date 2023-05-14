@@ -18,6 +18,16 @@
             "url": "https://www.buymeacoffee.com/jamesminor"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "JamesMinor\\Routing\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JamesMinor\\Routing\\": "tests/"
+        }
+    },
     "require": {
         "php": ">=8.0"
     },
