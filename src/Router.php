@@ -1,6 +1,6 @@
 <?php
 
-namespace src\JamesMinor\Routing;
+namespace JamesMinor\Routing;
 
 use DomainException;
 use Stringable;
