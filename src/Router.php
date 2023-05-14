@@ -182,6 +182,10 @@ class Router
 		{
 			$requestURI = substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?'));
 		}
+		elseif(!isset($_SERVER['REQUEST_URI']))
+		{
+			$requestURI = '';
+		}
 		else
 		{
 			$requestURI = $_SERVER['REQUEST_URI'];
