@@ -274,10 +274,18 @@ class Router
 	 * @param array $methods Array of HTTP methods that the route will respond to.
 	 * @param Stringable|string $pattern The pattern corresponding to the route, e.g. <b>/articles/{slug}</b>.
 	 * @param callable $callback The route callback function.
+	 * @throws DomainException If the passed methods array is empty.
+	 * @throws DomainException If the passed methods array contains a non-supported HTTP method.
 	 * @return void
 	 */
 	private function addRoute(array &$target, array $methods, Stringable|string $pattern, callable $callback): void
 	{
+		// Validating the methods array is not empty.
+		if(empty($methods))
+		{
+			throw new DomainException('Cannot add a route with no methods.');
+		}
+
 		// Iterating over each passed method.
 		foreach($methods as $method)
 		{
