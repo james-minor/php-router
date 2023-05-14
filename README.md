@@ -23,7 +23,7 @@ Creating a simple route for every route in the base directory:
 ```php
 $router = new JamesMinor\Routing\Router();
 
-$router->get('*', function()
+$router->get('', function()
 {
     echo 'Hello easy PHP routing!';
 });
@@ -61,17 +61,17 @@ $router = new JamesMinor\Routing\Router();
 
 $router->addBeforeRouterMiddleware(function()
 {
-    echo 'Before router middleware!';
+    echo 'Look ma!';
 });
 
 $router->addAfterRouterMiddleware(function()
 {
-    echo 'After router middleware!';
+    echo 'some middleware!';
 });
 
-$router->get('*', function()
+$router->get('', function()
 {
-    echo 'Hello world!';
+    echo ' I found ';
 });
 
 $router->run();
@@ -81,17 +81,17 @@ Adding route-specific middleware:
 ```php
 $router = new JamesMinor\Routing\Router();
 
-$router->addBeforeMiddleware(['GET'], '*', function()
+$router->addBeforeMiddleware(['GET'], '', function()
 {
     echo 'Before route middleware!';
 });
 
-$router->addAfterMiddleware(['GET'], '*', function()
+$router->addAfterMiddleware(['GET'], '', function()
 {
     echo 'After route middleware!';
 });
 
-$router->get('*', function()
+$router->get('', function()
 {
     echo 'Hello world!';
 });
