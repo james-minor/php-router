@@ -3,6 +3,8 @@
 ![[Minimum PHP Version](https://www.php.net)](https://img.shields.io/badge/PHP->%3D8.0-9cf)
 ![GitHub License](https://img.shields.io/github/license/james-minor/php-router)
 ![Router File Size](https://img.shields.io/github/size/james-minor/php-router/src/Router.php)
+![Line Code Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+
 
 Built with modern PHP 8.0 in mind, this routing library is single-file, 
 object-oriented, and built to be as easy as possible for developers to use.
