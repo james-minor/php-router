@@ -5,6 +5,9 @@ namespace src\JamesMinor\Routing;
 use DomainException;
 use Stringable;
 
+/**
+ * The Router class handles the routing of requested web URIs to their associated callbacks.
+ */
 class Router
 {
 	/**
