@@ -224,12 +224,22 @@ class Router
 	 */
 	private function iterateOverRouteArray(array $routes, string $requestURI): bool
 	{
+		// Validating that the request method is not null.
+		if(!isset($_SERVER['REQUEST_METHOD']))
+		{
+			$requestMethod = 'GET';
+		}
+		else
+		{
+			$requestMethod = $_SERVER['REQUEST_METHOD'];
+		}
+
 		// Iterating over each route, checking for matches.
 		$foundMatchingRoute = false;
 		foreach($routes as $route)
 		{
 			// Checking if the route request method matches the server request method.
-			if($route['method'] !== $_SERVER['REQUEST_METHOD'])
+			if($route['method'] !== $requestMethod)
 			{
 				continue;
 			}
