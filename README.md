@@ -2,8 +2,9 @@
 
 ![[Minimum PHP Version](https://www.php.net)](https://img.shields.io/badge/PHP->%3D8.0-9cf)
 
+
 Built with modern PHP 8.0 in mind, this routing library is single-file, 
-object-oriented, and built to be as easy as possible to use.
+object-oriented, and built to be as easy as possible for developers to use.
 
 ## Features
 
