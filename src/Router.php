@@ -253,17 +253,15 @@ class Router
 				{
 					continue;
 				}
-			}
-			else
-			{
-				continue;
-			}
-
-			// Calling the route callback (if it exists).
-			if(isset($route['callback']) && is_callable($route['callback']))
-			{
-				$route['callback']($this->getRouteParameterArray($route['pattern'], $requestURI));
-				$foundMatchingRoute = true;
+				else
+				{
+					// Calling the route callback (if it exists).
+					if(isset($route['callback']) && is_callable($route['callback']))
+					{
+						$route['callback']($this->getRouteParameterArray($route['pattern'], $requestURI));
+						$foundMatchingRoute = true;
+					}
+				}
 			}
 		}
 
