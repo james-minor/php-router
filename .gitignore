@@ -1,5 +1,6 @@
 .idea/
 vendor/
+html-coverage/
 
 composer.lock
 .phpunit.result.cache
