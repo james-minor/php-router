@@ -382,15 +382,18 @@ class Router
 
 		// Initializing the regex string.
 		$regex = '/^';
-		$regex .= '\/';
 
 		$tokens = explode('/', $pattern);
 		foreach($tokens as $token)
 		{
 			// Checking if the token is a dynamic parameter or a wildcard, or a static route.
-			if(str_starts_with($token, '{') && str_ends_with($token, '}') || $token == '*')
+			if(str_starts_with($token, '{') && str_ends_with($token, '}'))
 			{
 				$regex .= '[\w-]+';
+			}
+			elseif($token == '*')
+			{
+				$regex .= '[\w\/.-]+';
 			}
 			else
 			{
