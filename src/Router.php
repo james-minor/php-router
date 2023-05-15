@@ -382,6 +382,7 @@ class Router
 
 		// Initializing the regex string.
 		$regex = '/^';
+		$regex .= '\/';
 
 		$tokens = explode('/', $pattern);
 		foreach($tokens as $token)
