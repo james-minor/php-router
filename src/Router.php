@@ -200,11 +200,20 @@ class Router
 		// Iterating over each route after middleware.
 		$this->iterateOverRouteArray($this->afterMiddleware, $requestURI);
 
-		// Calling the 404 callback if the requested route does not exist.
-		if(!$foundMatchingRoute && is_callable($this->http404Callback))
+		// Setting the HTTP response code.
+		if($foundMatchingRoute)
+		{
+			http_response_code(200);
+		}
+		else
 		{
 			http_response_code(404);
-			call_user_func($this->http404Callback);
+
+			// Calling the 404 callback, if it is callable.
+			if(is_callable($this->http404Callback))
+			{
+				call_user_func($this->http404Callback);
+			}
 		}
 
 		// Calling after router middleware.
