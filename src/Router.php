@@ -249,11 +249,7 @@ class Router
 			{
 				$patternRegex = $this->convertPatternToRegex($route['pattern']);
 
-				if(!preg_match($patternRegex, $requestURI))
-				{
-					continue;
-				}
-				else
+				if(preg_match($patternRegex, $requestURI))
 				{
 					// Calling the route callback (if it exists).
 					if(isset($route['callback']) && is_callable($route['callback']))
