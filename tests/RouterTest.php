@@ -13,74 +13,84 @@ use PHPUnit\Framework\TestCase;
 class RouterTest extends TestCase
 {
 
-	public static function validHttpMethodProvider(): array
+	public static function httpMethodProvider(): array
 	{
 		return [
-			['GET'],
-			['POST'],
-			['DELETE'],
-			['PUT'],
-			['get'],
-			['post'],
-			['delete'],
-			['put']
+			['GET', true],
+			['POST', true],
+			['DELETE', true],
+			['PUT', true],
+			['PATCH', true],
+			['OPTIONS', true],
+			['HEAD', true],
+			['get', true],
+			['post', true],
+			['delete', true],
+			['put', true],
+			['patch', true],
+			['options', true],
+			['head', true],
+			['', false],
+			['1234', false],
+			[1234, false],
+			['delet', false],
+			['foo', false],
+			['BAR', false],
+			[array(), false],
+			[[], false]
 		];
 	}
 
-	public static function invalidHttpMethodProvider(): array
+	#[DataProvider('httpMethodProvider')]
+	public function testMappingMethodRoutes(mixed $method, bool $validMethod)
 	{
-		return [
-			[''],
-			['1234'],
-			[1234],
-			['delet'],
-			['foo'],
-			['BAR']
-		];
-	}
-
-	#[DataProvider('invalidHttpMethodProvider')]
-	public function testMappingInvalidRouteMethods(mixed $method)
-	{
-		$this->expectException(\DomainException::class);
-
-		$router = new Router();
-		$router->map([$method], '', function() {});
-		$router->run();
-	}
-
-	public function testMappingEmptyRouteArray()
-	{
-		$this->expectException(\DomainException::class);
-
-		$router = new Router();
-		$router->map([], '', function() {});
-	}
-
-	#[DataProvider('validHttpMethodProvider')]
-	public function testMappingValidRouteMethods(string $method)
-	{
-		$this->expectNotToPerformAssertions();
-
-		$router = new Router();
-		$router->map([$method], '', function() {});
-		$router->run();
-	}
-
-	#[DataProvider('validHttpMethodProvider')]
-	public function testAddingRoutes(string $method)
-	{
-		$this->expectOutputString('test');
-
-		$_SERVER['REQUEST_URI'] = '/';
-		$_SERVER['REQUEST_METHOD'] = strtoupper($method);
-
-		$router = new Router();
-		$router->{strtolower($method)}('', function()
+		if(!$validMethod)
 		{
-			echo 'test';
-		});
+			$this->expectException(\DomainException::class);
+		}
+
+		$_SERVER['REQUEST_METHOD'] = $method;
+
+		$router = new Router();
+		$router->map([$method], '/', function() {});
 		$router->run();
+
+		if($validMethod)
+		{
+			$this->assertEquals(200, http_response_code());
+		}
+	}
+
+	public static function shorthandMethodProvider(): array
+	{
+		return [
+			['get', 'GET'],
+			['post', 'POST'],
+			['delete', 'DELETE'],
+			['put', 'PUT'],
+			['patch', 'PATCH'],
+			['options', 'OPTIONS'],
+			['head', 'HEAD'],
+			['all', 'GET'],
+			['all', 'POST'],
+			['all', 'DELETE'],
+			['all', 'PUT'],
+			['all', 'PATCH'],
+			['all', 'OPTIONS'],
+			['all', 'HEAD']
+		];
+	}
+
+	#[DataProvider('shorthandMethodProvider')]
+	public function testShorthandMethods(string $shorthandFunction, $httpMethod)
+	{
+		$_SERVER['REQUEST_METHOD'] = $httpMethod;
+
+		$router = new Router();
+		$router->{$shorthandFunction}('/', function() {});
+		$router->run();
+
+		$this->assertEquals(200, http_response_code());
 	}
 
 	public static function routePatternProvider(): array
@@ -93,6 +103,7 @@ class RouterTest extends TestCase
 			['*', '/foo/bar/baz/fizz/buzz', 200],
 			['/', '/', 200],
 			['articles', '/articles', 200],
+			['/*', '/foo/bar', 200],
 			['*.txt', '/test......txt', 404],
 			['/articles', '/particles', 404],
 			['/foo/bar', '/foo/bar/baz', 404]
@@ -122,10 +133,10 @@ class RouterTest extends TestCase
 
 	public function testNoRouteFoundCallback()
 	{
-		$this->expectOutputString('<h1>404</h1><span>Page not found.</span>');
-
 		$router = new Router();
 		$router->run();
+
+		$this->assertEquals(404, http_response_code());
 	}
 
 	public function testSetting404Callback()
