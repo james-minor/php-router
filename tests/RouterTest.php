@@ -246,4 +246,18 @@ class RouterTest extends TestCase
 		});
 		$router->run();
 	}
+
+	public function testHeadRequestHasNoBody()
+	{
+		$this->expectOutputString('');
+
+		$_SERVER['REQUEST_METHOD'] = 'HEAD';
+
+		$router = new Router();
+		$router->head('/', function()
+		{
+			echo 'NON VALID HEAD BODY DATA!';
+		});
+		$router->run();
+	}
 }
