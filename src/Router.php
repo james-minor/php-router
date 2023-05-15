@@ -177,14 +177,14 @@ class Router
 			$middleware();
 		}
 
-		// Getting the request URI, minus any URL parameters.
-		if(str_contains($_SERVER['REQUEST_URI'], '?'))
+		// Parsing the requested URI.
+		if(!isset($_SERVER['REQUEST_URI']) || $_SERVER['REQUEST_URI'] == '')
+		{
+			$requestURI = '/';
+		}
+		elseif(str_contains($_SERVER['REQUEST_URI'], '?'))
 		{
 			$requestURI = substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?'));
-		}
-		elseif(!isset($_SERVER['REQUEST_URI']))
-		{
-			$requestURI = '';
 		}
 		else
 		{
