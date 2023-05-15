@@ -17,7 +17,10 @@ class Router
 		'GET',
 		'POST',
 		'PUT',
-		'DELETE'
+		'DELETE',
+		'PATCH',
+		'OPTIONS',
+		'HEAD'
 	);
 
 	/**
@@ -243,6 +246,12 @@ class Router
 			$requestMethod = $_SERVER['REQUEST_METHOD'];
 		}
 
+		// Buffering the output if this is a HEAD request.
+		if($requestMethod == 'HEAD')
+		{
+			ob_start();
+		}
+
 		// Iterating over each route, checking for matches.
 		$foundMatchingRoute = false;
 		foreach($routes as $route)
@@ -269,6 +278,8 @@ class Router
 				}
 			}
 		}
+
+		ob_end_clean();  // Closing the output buffer.
 
 		return $foundMatchingRoute;
 	}
