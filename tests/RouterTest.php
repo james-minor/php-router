@@ -104,6 +104,10 @@ class RouterTest extends TestCase
 			['/', '/', 200],
 			['articles', '/articles', 200],
 			['/*', '/foo/bar', 200],
+			['/', null, 200],
+			['/', '', 200],
+			['/foo', '/foo?parameter=1', 200],
+			['/foo', '/foo?bar=1&baz=2', 200],
 			['*.txt', '/test......txt', 404],
 			['/articles', '/particles', 404],
 			['/foo/bar', '/foo/bar/baz', 404]
@@ -111,7 +115,7 @@ class RouterTest extends TestCase
 	}
 
 	#[DataProvider('routePatternProvider')]
-	public function testRoutePatterns(string $pattern, string $requestURI, int $expected)
+	public function testRoutePatterns(string $pattern, mixed $requestURI, int $expected)
 	{
 		$_SERVER['REQUEST_URI'] = $requestURI;
 
