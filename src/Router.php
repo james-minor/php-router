@@ -211,6 +211,18 @@ class Router
 	}
 
 	/**
+	 * Maps a route to EVERY HTTP request method type.
+	 *
+	 * @param Stringable|string $pattern The pattern corresponding to the route, e.g. <b>/articles/{slug}</b>.
+	 * @param callable $callback The route callback function.
+	 * @return void
+	 */
+	public function all(Stringable|string $pattern, callable $callback): void
+	{
+		$this->addRoute($this->routes, Router::SUPPORTED_HTTP_METHODS, $pattern, $callback);
+	}
+
+	/**
 	 * Runs the router over every saved route. <b>NOTE:</b> If multiple route matches are found,
 	 * all of them will be called sequentially.
 	 *
