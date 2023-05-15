@@ -154,6 +154,50 @@ class Router
 	}
 
 	/**
+	 * Adds a route that responds to PATCH requests.
+	 *
+	 * Shorthand function for calling <b>$this->map(['PATCH'], $pattern, $callback);</b>
+	 *
+	 * @param Stringable|string $pattern The pattern corresponding to the route.
+	 * @param callable $callback The route callback function.
+	 * @return void
+	 */
+	public function patch(Stringable|string $pattern, callable $callback): void
+	{
+		$this->addRoute($this->routes, ['PATCH'], $pattern, $callback);
+	}
+
+	/**
+	 * Adds a route that responds to OPTIONS requests.
+	 *
+	 * Shorthand function for calling <b>$this->map(['OPTIONS'], $pattern, $callback);</b>
+	 *
+	 * @param Stringable|string $pattern The pattern corresponding to the route.
+	 * @param callable $callback The route callback function.
+	 * @return void
+	 */
+	public function options(Stringable|string $pattern, callable $callback): void
+	{
+		$this->addRoute($this->routes, ['OPTIONS'], $pattern, $callback);
+	}
+
+	/**
+	 * Adds a route that responds to HEAD requests.
+	 *
+	 * Shorthand function for calling <b>$this->map(['HEAD'], $pattern, $callback);</b>
+	 *
+	 * <b>NOTE:</b> All output will be buffered and not-sent to the client, following RFC 2616.
+	 *
+	 * @param Stringable|string $pattern The pattern corresponding to the route.
+	 * @param callable $callback The route callback function.
+	 * @return void
+	 */
+	public function head(Stringable|string $pattern, callable $callback): void
+	{
+		$this->addRoute($this->routes, ['HEAD'], $pattern, $callback);
+	}
+
+	/**
 	 * Allows the mapping of multiple HTTP method types to one route.
 	 *
 	 * @param array $methods Array of HTTP methods to respond to, e.g. ['GET', 'POST'].
