@@ -279,7 +279,11 @@ class Router
 			}
 		}
 
-		ob_end_clean();  // Closing the output buffer.
+		// Closing the output buffer.
+		if($requestMethod == 'HEAD')
+		{
+			ob_end_clean();
+		}
 
 		return $foundMatchingRoute;
 	}
