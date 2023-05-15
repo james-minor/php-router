@@ -391,9 +391,9 @@ class Router
 			{
 				$regex .= '[\w-]+';
 			}
-			elseif($token == '*')
+			elseif(str_contains($token, '*'))
 			{
-				$regex .= '[\w\/.-]+';
+				$regex .= str_replace('*', '[\w\/.-]+', $token);
 			}
 			else
 			{
