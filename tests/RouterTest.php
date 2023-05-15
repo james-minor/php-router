@@ -40,7 +40,7 @@ class RouterTest extends TestCase
 	}
 
 	#[DataProvider('invalidHttpMethodProvider')]
-	public function testMappingInvalidRoutes(mixed $method)
+	public function testMappingInvalidRouteMethods(mixed $method)
 	{
 		$this->expectException(\DomainException::class);
 
@@ -58,7 +58,7 @@ class RouterTest extends TestCase
 	}
 
 	#[DataProvider('validHttpMethodProvider')]
-	public function testMappingValidRoutes(string $method)
+	public function testMappingValidRouteMethods(string $method)
 	{
 		$this->expectNotToPerformAssertions();
 
@@ -81,6 +81,34 @@ class RouterTest extends TestCase
 			echo 'test';
 		});
 		$router->run();
+	}
+
+	public static function routePatternProvider(): array
+	{
+		return [
+			['*.txt', '/test.txt', 200],
+			['/articles', '/articles', 200],
+			['/articles/{slug}', '/articles/example-slug', 200],
+			['/foo/bar/*', '/foo/bar/baz/fizz/buzz', 200],
+			['*', '/foo/bar/baz/fizz/buzz', 200],
+			['/', '/', 200],
+			['articles', '/articles', 200],
+			['*.txt', '/test......txt', 404],
+			['/articles', '/particles', 404],
+			['/foo/bar', '/foo/bar/baz', 404]
+		];
+	}
+
+	#[DataProvider('routePatternProvider')]
+	public function testRoutePatterns(string $pattern, string $requestURI, int $expected)
+	{
+		$_SERVER['REQUEST_URI'] = $requestURI;
+
+		$router = new Router();
+		$router->get($pattern, function() {});
+		$router->run();
+
+		$this->assertEquals($expected, http_response_code());
 	}
 
 	public function testRunningRouter()
