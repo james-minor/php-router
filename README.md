@@ -12,7 +12,7 @@ object-oriented, and built to be as easy as possible for developers to use.
 ## Features
 
 - Single-page Router class
-- Supports HTTP `GET`, `POST`, `PUT`, and `DELETE` requests.
+- Supports HTTP `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS`, `PATCH`, and `HEAD` requests.
 - Contains shorthand methods for each HTTP request type.
 - Add named route parameters using `{curly-braces}`.
 - Use wildcards in routes using `*`.
