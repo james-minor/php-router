@@ -291,6 +291,7 @@ class Router
 	 * @param array $methods Array of HTTP methods that the route will respond to.
 	 * @param Stringable|string $pattern The pattern corresponding to the route, e.g. <b>/articles/{slug}</b>.
 	 * @param callable $callback The route callback function.
+	 * @throws DomainException If the passed methods array method is not of type string or Stringable.
 	 * @throws DomainException If the passed methods array is empty.
 	 * @throws DomainException If the passed methods array contains a non-supported HTTP method.
 	 * @return void
@@ -306,6 +307,12 @@ class Router
 		// Iterating over each passed method.
 		foreach($methods as $method)
 		{
+			// Validating that the method type is of type string or Stringable.
+			if(gettype($method) !== 'string' && !($method instanceof Stringable))
+			{
+				throw new DomainException('Passed method must be of type "string".');
+			}
+
 			// Checking if the passed method is supported.
 			if(!in_array(strtoupper($method), self::SUPPORTED_HTTP_METHODS))
 			{
