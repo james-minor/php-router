@@ -101,6 +101,7 @@ class RouterTest extends TestCase
 			['/articles/{slug}', '/articles/example-slug', 200],
 			['/foo/bar/*', '/foo/bar/baz/fizz/buzz', 200],
 			['*', '/foo/bar/baz/fizz/buzz', 200],
+			['*', '/foo.txt', 200],
 			['/', '/', 200],
 			['articles', '/articles', 200],
 			['/*', '/foo/bar', 200],
@@ -108,7 +109,8 @@ class RouterTest extends TestCase
 			['/', '', 200],
 			['/foo', '/foo?parameter=1', 200],
 			['/foo', '/foo?bar=1&baz=2', 200],
-			['*.txt', '/test......txt', 404],
+			['*.txt', '/test......txt', 200],
+			['*.txt', '/test.../txt', 404],
 			['/articles', '/particles', 404],
 			['/foo/bar', '/foo/bar/baz', 404]
 		];
