@@ -520,7 +520,7 @@ class Router
 		{
 			if(isset($parameters[$index]))
 			{
-				$parameters[$index]['value'] = $token;
+				$parameters[$index]['value'] = htmlspecialchars($token);
 			}
 		}
 
@@ -528,7 +528,7 @@ class Router
 		$keyValuePairs = array();
 		foreach($parameters as $parameter)
 		{
-			$keyValuePairs[$parameter['key']] = $parameter['value'];
+			$keyValuePairs[$parameter['key']] = htmlspecialchars($parameter['value']);
 		}
 
 		return $keyValuePairs;
